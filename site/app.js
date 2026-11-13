@@ -35,17 +35,21 @@ function setStatus(message) {
 
 function showLoading(show) {
   $("#loading").classList.toggle("active", show);
+  $("#modelUnit").classList.toggle("running", show);
+  $("#modelUnit").classList.toggle("complete", !show && !!session);
+  $("#modelPhase").textContent = show ? "Finding patterns…" : "Ready for a scene";
 }
 
 async function loadModel() {
   if (!window.ort) throw new Error("ONNX Runtime could not load. Check your connection.");
   ort.env.wasm.numThreads = 1;
   ort.env.wasm.wasmPaths = RUNTIME;
-  setStatus("Loading the trained model…");
+  setStatus("Loading the trained modelâ€¦");
   session = await ort.InferenceSession.create("models/best.onnx", {
     executionProviders: ["wasm"]
   });
   setStatus("Model ready. Choose an image or video, or try a sample.");
+  $("#modelPhase").textContent = "Ready for a scene";
 }
 
 function prepareInput(image) {
@@ -89,7 +93,7 @@ function decodeOutput(tensor, source) {
   const candidates = channelsFirst ? dimensions[2] : dimensions[1];
   const channels = CLASSES.length + 4;
   if (!channelsFirst && dimensions[2] !== channels) {
-    throw new Error(`Unexpected model output: ${dimensions.join(" × ")}`);
+    throw new Error(`Unexpected model output: ${dimensions.join(" Ã— ")}`);
   }
   const value = (channel, candidate) => channelsFirst
     ? tensor.data[channel * candidates + candidate]
@@ -181,7 +185,7 @@ function updateReport(boxes) {
   for (const [label, total] of Object.entries(counts)) {
     const tag = document.createElement("span");
     tag.className = `tag ${concerns[label] ? "alert" : ""}`;
-    tag.textContent = `${label} × ${total}`;
+    tag.textContent = `${label} Ã— ${total}`;
     tags.append(tag);
   }
   if (!tags.children.length) {
@@ -197,6 +201,10 @@ function showSource(media) {
   const preview = $("#sourcePreview");
   preview.replaceChildren(media);
   preview.hidden = false;
+  $("#drop").classList.add("has-media");
+  preview.classList.remove("arriving");
+  void preview.offsetWidth;
+  preview.classList.add("arriving");
 }
 
 function reset() {
@@ -212,6 +220,7 @@ function reset() {
   concerns = {};
   framesAnalyzed = 0;
   mode = "idle";
+  $("#modelUnit").classList.remove("running", "complete");
   $("#report").classList.remove("show");
   $("#downloadMedia").hidden = true;
   $("#downloadReport").hidden = true;
@@ -240,13 +249,16 @@ async function analyzeImage(url) {
   reset();
   const currentRun = runId;
   showLoading(true);
-  setStatus("Scanning the image…");
+  setStatus("Scanning the imageâ€¦");
   const image = new Image();
   image.onload = async () => {
     if (currentRun !== runId) return;
     try {
       showSource(image);
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      const started = performance.now();
       const boxes = await detect(image);
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) await new Promise(resolve => setTimeout(resolve, Math.max(0, 1100 - (performance.now() - started))));
       if (currentRun !== runId) return;
       drawResult(image, boxes);
       framesAnalyzed = 1;
@@ -256,7 +268,7 @@ async function analyzeImage(url) {
       link.download = "sitesight-annotated.png";
       link.hidden = false;
       offerReport("image");
-      setStatus(`Analysis complete · ${boxes.length} objects detected.`);
+      setStatus(`Analysis complete Â· ${boxes.length} objects detected.`);
     } catch (error) {
       setStatus(`Analysis failed: ${error.message}`);
     } finally {
@@ -279,7 +291,7 @@ async function analyzeVideo(url) {
   reset();
   const currentRun = runId;
   showLoading(true);
-  setStatus("Loading video…");
+  setStatus("Loading videoâ€¦");
   const video = document.createElement("video");
   video.muted = true;
   video.playsInline = true;
@@ -300,7 +312,7 @@ async function analyzeVideo(url) {
     $("#pauseVideo").textContent = "Pause video";
     mode = "video";
     showLoading(false);
-    setStatus("Analyzing video frames live…");
+    setStatus("Analyzing video frames liveâ€¦");
     await video.play();
 
     if (window.MediaRecorder && resultCanvas.captureStream && MediaRecorder.isTypeSupported("video/webm")) {
@@ -318,7 +330,7 @@ async function analyzeVideo(url) {
         const link = $("#downloadMedia");
         link.href = URL.createObjectURL(new Blob(chunks, { type: format }));
         link.download = "sitesight-annotated.webm";
-        link.textContent = "↓ Download annotated video";
+        link.textContent = "â†“ Download annotated video";
         link.hidden = false;
       };
       recorder.start(1000);
@@ -333,7 +345,7 @@ async function analyzeVideo(url) {
         drawResult(still, boxes);
         framesAnalyzed++;
         updateReport(boxes);
-        setStatus(`Analyzing video · ${video.currentTime.toFixed(1)} / ${video.duration.toFixed(1)} s · ${framesAnalyzed} frames scanned`);
+        setStatus(`Analyzing video Â· ${video.currentTime.toFixed(1)} / ${video.duration.toFixed(1)} s Â· ${framesAnalyzed} frames scanned`);
       } catch (error) {
         video.pause();
         setStatus(`Video analysis stopped: ${error.message}`);
@@ -345,9 +357,11 @@ async function analyzeVideo(url) {
     if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(nextFrame);
     else setStatus("This browser cannot process video frames. Try a recent Chrome or Edge browser.");
     video.onended = () => {
+      showLoading(false);
+      $("#modelPhase").textContent = "Analysis complete";
       if (recorder && recorder.state !== "inactive") recorder.stop();
       offerReport("video");
-      setStatus(`Video complete · ${framesAnalyzed} frames analyzed.`);
+      setStatus(`Video complete Â· ${framesAnalyzed} frames analyzed.`);
     };
   } catch (error) {
     showLoading(false);
