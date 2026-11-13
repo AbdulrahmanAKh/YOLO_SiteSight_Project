@@ -37,14 +37,14 @@ function showLoading(show) {
   $("#loading").classList.toggle("active", show);
   $("#modelUnit").classList.toggle("running", show);
   $("#modelUnit").classList.toggle("complete", !show && !!session);
-  $("#modelPhase").textContent = show ? "Finding patterns…" : "Ready for a scene";
+  $("#modelPhase").textContent = show ? "Finding patterns..." : "Ready for a scene";
 }
 
 async function loadModel() {
   if (!window.ort) throw new Error("ONNX Runtime could not load. Check your connection.");
   ort.env.wasm.numThreads = 1;
   ort.env.wasm.wasmPaths = RUNTIME;
-  setStatus("Loading the trained modelâ€¦");
+  setStatus("Loading the trained model…");
   session = await ort.InferenceSession.create("models/best.onnx", {
     executionProviders: ["wasm"]
   });
@@ -93,7 +93,7 @@ function decodeOutput(tensor, source) {
   const candidates = channelsFirst ? dimensions[2] : dimensions[1];
   const channels = CLASSES.length + 4;
   if (!channelsFirst && dimensions[2] !== channels) {
-    throw new Error(`Unexpected model output: ${dimensions.join(" Ã— ")}`);
+    throw new Error(`Unexpected model output: ${dimensions.join(" × ")}`);
   }
   const value = (channel, candidate) => channelsFirst
     ? tensor.data[channel * candidates + candidate]
@@ -185,7 +185,7 @@ function updateReport(boxes) {
   for (const [label, total] of Object.entries(counts)) {
     const tag = document.createElement("span");
     tag.className = `tag ${concerns[label] ? "alert" : ""}`;
-    tag.textContent = `${label} Ã— ${total}`;
+    tag.textContent = `${label} × ${total}`;
     tags.append(tag);
   }
   if (!tags.children.length) {
@@ -249,7 +249,7 @@ async function analyzeImage(url) {
   reset();
   const currentRun = runId;
   showLoading(true);
-  setStatus("Scanning the imageâ€¦");
+  setStatus("Scanning the image…");
   const image = new Image();
   image.onload = async () => {
     if (currentRun !== runId) return;
@@ -268,7 +268,7 @@ async function analyzeImage(url) {
       link.download = "sitesight-annotated.png";
       link.hidden = false;
       offerReport("image");
-      setStatus(`Analysis complete Â· ${boxes.length} objects detected.`);
+      setStatus(`Analysis complete · ${boxes.length} objects detected.`);
     } catch (error) {
       setStatus(`Analysis failed: ${error.message}`);
     } finally {
@@ -291,7 +291,7 @@ async function analyzeVideo(url) {
   reset();
   const currentRun = runId;
   showLoading(true);
-  setStatus("Loading videoâ€¦");
+  setStatus("Loading video…");
   const video = document.createElement("video");
   video.muted = true;
   video.playsInline = true;
@@ -312,7 +312,7 @@ async function analyzeVideo(url) {
     $("#pauseVideo").textContent = "Pause video";
     mode = "video";
     showLoading(false);
-    setStatus("Analyzing video frames liveâ€¦");
+    setStatus("Analyzing video frames live…");
     await video.play();
 
     if (window.MediaRecorder && resultCanvas.captureStream && MediaRecorder.isTypeSupported("video/webm")) {
@@ -330,7 +330,7 @@ async function analyzeVideo(url) {
         const link = $("#downloadMedia");
         link.href = URL.createObjectURL(new Blob(chunks, { type: format }));
         link.download = "sitesight-annotated.webm";
-        link.textContent = "â†“ Download annotated video";
+        link.textContent = "↓ Download annotated video";
         link.hidden = false;
       };
       recorder.start(1000);
@@ -345,7 +345,7 @@ async function analyzeVideo(url) {
         drawResult(still, boxes);
         framesAnalyzed++;
         updateReport(boxes);
-        setStatus(`Analyzing video Â· ${video.currentTime.toFixed(1)} / ${video.duration.toFixed(1)} s Â· ${framesAnalyzed} frames scanned`);
+        setStatus(`Analyzing video · ${video.currentTime.toFixed(1)} / ${video.duration.toFixed(1)} s · ${framesAnalyzed} frames scanned`);
       } catch (error) {
         video.pause();
         setStatus(`Video analysis stopped: ${error.message}`);
@@ -361,7 +361,7 @@ async function analyzeVideo(url) {
       $("#modelPhase").textContent = "Analysis complete";
       if (recorder && recorder.state !== "inactive") recorder.stop();
       offerReport("video");
-      setStatus(`Video complete Â· ${framesAnalyzed} frames analyzed.`);
+      setStatus(`Video complete · ${framesAnalyzed} frames analyzed.`);
     };
   } catch (error) {
     showLoading(false);
