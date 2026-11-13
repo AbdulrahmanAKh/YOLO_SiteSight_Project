@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#111a17">
-  <title>SiteSight — Construction Safety AI</title>
+  <title>SiteSight â€” Construction Safety AI</title>
   <meta name="description" content="Explore a construction safety detector with real browser-based YOLO inference.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,63 +17,46 @@
   <div class="shell">
     <header>
       <a class="brand" href="#top"><span class="brand-mark"></span>SiteSight<span style="color:var(--lime)">.</span></a>
-      <nav><a href="#demo">Live demo</a><a href="#how">How it works</a><a href="https://github.com/AbdulrahmanAKh/YOLO_SiteSight_Project/blob/main/notebooks/Construction_Safety_AI.ipynb">Notebook</a></nav>
-      <span class="header-badge">● PORTFOLIO PROJECT</span>
+      <nav><a href="#how">How it works</a><a class="source-link" href="https://github.com/AbdulrahmanAKh/YOLO_SiteSight_Project" target="_blank" rel="noopener"><span aria-hidden="true">â—‰</span> GitHub</a><a class="source-link" href="https://colab.research.google.com/github/AbdulrahmanAKh/YOLO_SiteSight_Project/blob/main/notebooks/Construction_Safety_AI.ipynb" target="_blank" rel="noopener"><span class="colab-icon" aria-hidden="true">âˆž</span> Open in Colab</a></nav>
+      <span class="header-badge">By Abdulrahman Alkhatib</span>
     </header>
 
     <main id="top">
-      <section class="hero">
-        <div>
-          <div class="eyebrow">Computer vision for safer sites</div>
-          <h1>See the site.<br><em>Spot the risk.</em></h1>
-          <p>Drop in a construction photo or video. A trained YOLO model runs in your browser, marks detected objects, and surfaces possible PPE concerns for review.</p>
-          <div class="hero-actions"><a class="primary" href="#demo">Try the model →</a><span class="subtle">Your file stays on your device</span></div>
-        </div>
-        <div class="hero-art" aria-label="Illustration of construction worker under an AI detection box" role="img">
-          <div class="sun"></div><div class="crane"></div><div class="building b1"></div><div class="building b2"></div>
-          <div class="worker"><div class="legs"></div></div><div class="scan-box"><span>PERSON · 0.94</span></div>
-          <div class="hud"><span><i class="dot"></i>VISION ACTIVE</span><span>FRAME 001 / SITE</span></div>
-        </div>
-      </section>
-
-      <div class="strip">
-        <div><b>17 construction classes</b><span>Workers, PPE, vehicles, and site equipment</span></div>
-        <div><b>Real model inference</b><span>Detection boxes from your trained ONNX model</span></div>
-        <div><b>Human review</b><span>Possible concerns, never automatic compliance verdicts</span></div>
-      </div>
-
       <section id="demo">
         <div class="section-head">
-          <div><div class="eyebrow">Interactive model</div><h2>Put the model to work.</h2></div>
-          <p>Use one of the sample scenes or choose your own image or video. The model runs locally in this browser tab.</p>
+          <div><h1>Inspect a construction scene.</h1></div>
+          <p>Choose a photo or video. Watch YOLO find workers, equipment, and possible missing PPE. Your files stay on your device.</p>
         </div>
         <div class="workspace">
           <div class="panel">
-            <div class="panel-top"><h3>01 / Input media</h3><span class="pill">YOUR FILE</span></div>
+            <div class="panel-top"><h3>1. Your scene</h3><span class="pill">Input</span></div>
             <div id="drop" class="drop" tabindex="0" role="button" aria-label="Choose or drop an image or video">
-              <span class="upload-icon">↥</span><strong>Drop your site footage here</strong><p>or choose a file from your device</p>
+              <div id="sourcePreview" class="source-preview" hidden></div><span class="upload-icon">â†¥</span><strong>Drop your site footage here</strong><p>or choose a file from your device</p>
               <button id="browse" class="secondary" type="button">Browse files</button>
               <input id="file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" hidden>
             </div>
-            <p class="hint">JPG, PNG, WebP, MP4, WebM, MOV · Short clips work best</p>
+            <p class="hint">JPG, PNG, WebP, MP4, WebM, MOV Â· Short clips work best</p>
             <div class="sample-label">OR START WITH A REAL CONSTRUCTION SAMPLE</div>
             <div class="sample-options">
-              <button id="sampleImage" class="sample-card" type="button"><img src="assets/sample-construction.jpg" alt="Four construction workers with PPE"><span><strong>Try sample image</strong><small>Workers + PPE · CC BY 4.0</small></span><b>→</b></button>
-              <button id="sampleVideo" class="sample-card" type="button"><span class="video-thumb">▶</span><span><strong>Try sample video</strong><small>Active site footage · CC BY-SA 4.0</small></span><b>→</b></button>
+              <button id="sampleImage" class="sample-card" type="button"><img src="assets/sample-construction.jpg" alt="Four construction workers with PPE"><span><strong>Try sample image</strong><small>Workers + PPE Â· CC BY 4.0</small></span><b>â†’</b></button>
+              <button id="sampleVideo" class="sample-card" type="button"><span class="video-thumb">â–¶</span><span><strong>Try sample video</strong><small>Active site footage Â· CC BY-SA 4.0</small></span><b>â†’</b></button>
             </div>
             <p class="sample-credit">Photo from <a href="https://huggingface.co/datasets/LibreYOLO/construction-safety-gsnvb" target="_blank" rel="noopener noreferrer">LibreYOLO</a>. Video by <a href="https://commons.wikimedia.org/wiki/File:Building_construction_Moira_Close_Broadwater_Farm_Haringey_2025_16.webm" target="_blank" rel="noopener noreferrer">Acabashi</a>.</p>
-            <div id="sourcePreview" class="source-preview" hidden></div>
-            <div id="status" class="status" role="status" aria-live="polite">Loading model…</div>
+            <div id="status" class="status" role="status" aria-live="polite">Loading modelâ€¦</div>
           </div>
 
-          <div class="panel">
-            <div class="panel-top"><h3>02 / Annotated result</h3><span class="pill">MODEL OUTPUT</span></div>
+          <div id="modelUnit" class="model-unit" aria-label="YOLO detection model">
+            <div class="model-caption">2. Detect</div><div class="model-core"><svg viewBox="0 0 160 180" aria-hidden="true"><g class="connections" stroke="currentColor" fill="none"><path d="M30 35L80 25L130 45M30 35L80 85L130 45M30 90L80 25L130 95M30 90L80 85L130 145M30 145L80 85L130 95M30 145L80 155L130 145M80 155L130 95"/></g><g fill="currentColor"><circle cx="30" cy="35" r="6"/><circle cx="30" cy="90" r="6"/><circle cx="30" cy="145" r="6"/><circle cx="80" cy="25" r="7"/><circle cx="80" cy="85" r="7"/><circle cx="80" cy="155" r="7"/><circle cx="130" cy="45" r="6"/><circle cx="130" cy="95" r="6"/><circle cx="130" cy="145" r="6"/></g></svg><strong>YOLO11n</strong><span id="modelPhase">Preparing model</span></div>
+            <div class="model-stages"><span>Read pixels</span><span>Find patterns</span><span>Draw boxes</span></div><small>Trained model Â· 17 classes</small>
+          </div>
+          <div class="panel output-panel">
+            <div class="panel-top"><h3>3. Detected objects</h3><span class="pill">Output</span></div>
             <div id="preview" class="preview-area">
-              <div id="empty" class="empty"><span class="target">⌗</span>Your analysis will appear here</div>
+              <div id="empty" class="empty"><span class="target">âŒ—</span>Choose a scene to see its detections</div>
               <canvas id="resultCanvas" hidden aria-label="Annotated construction scene"></canvas>
-              <div id="loading" class="loading" role="status"><span class="spinner"></span><b>Scanning the site…</b><small>Finding objects and possible PPE concerns</small></div>
+              <div id="loading" class="loading" role="status"><span class="scan-grid" aria-hidden="true"></span><b>Scanning the siteâ€¦</b><small>Finding objects and possible PPE concerns</small></div>
             </div>
-            <div class="actions"><button id="pauseVideo" class="secondary" type="button" hidden>Pause video</button><a id="downloadMedia" href="#" download hidden>↓ Download annotated image</a><a id="downloadReport" href="#" download hidden>↓ Download report</a></div>
+            <div class="actions"><button id="pauseVideo" class="secondary" type="button" hidden>Pause video</button><a id="downloadMedia" href="#" download hidden>â†“ Download annotated image</a><a id="downloadReport" href="#" download hidden>â†“ Download report</a></div>
           </div>
         </div>
         <div id="report" class="report" aria-live="polite">
@@ -85,15 +68,17 @@
       </section>
 
       <section id="how">
-        <div class="section-head"><div><div class="eyebrow">Behind the demo</div><h2>From pixels to perspective.</h2></div></div>
+        <div class="section-head"><div><h2>What happens inside?</h2></div><p>The moving diagram shows inference: applying patterns learned during training to a new scene.</p></div>
         <div class="how">
-          <div class="step"><em>01 / INPUT</em><h3>Bring a real scene</h3><p>Choose a sample or drop a raw site photo or short video. Files are processed on your device.</p></div>
-          <div class="step"><em>02 / DETECT</em><h3>Find what matters</h3><p>The trained YOLO11 model locates construction objects and PPE. Its bounding boxes appear over the actual frame.</p></div>
-          <div class="step"><em>03 / REVIEW</em><h3>See the evidence</h3><p>Inspect detections and possible missing-PPE classes. A person remains responsible for any safety judgment.</p></div>
+          <div class="step"><em>1 / Prepare</em><h3>A scene becomes pixels</h3><p>The image, or each video frame, is resized to fit 640 Ã— 640 pixels. Padding keeps the original proportions.</p></div>
+          <div class="step"><em>2 / Detect</em><h3>Learned patterns find objects</h3><p>YOLO11n predicts object locations and 17 construction classes. Low confidence predictions and overlapping duplicates are filtered out.</p></div>
+          <div class="step"><em>3 / Review</em><h3>Boxes become evidence</h3><p>Boxes and confidence scores appear on your scene. Explicit no-hardhat, no-mask, and no-safety vest predictions are flagged for your review.</p></div>
         </div>
+        <div class="training-notes"><div><h2>Trained for the construction site.</h2><p>We fine-tuned the compact, pretrained YOLO11n detector for 40 epochs on the <a href="https://huggingface.co/datasets/pyimagesearch/construction-safety-object-detection-paligemma">construction safety object detection dataset from PyImageSearch</a>. It uses bounding-box annotations for workers, PPE, vehicles, and site equipment.</p><p>The notebook uses 307 training images, 57 validation images, and 34 held-out test images. This is object detection; the model draws boxes around objects.</p></div><div class="evaluation"><strong>46.5%</strong><span>Test mAP at IoU 0.50</span><p>A small test set, with limited examples of some PPE concerns. Missed objects and false alarms are possible. Review the scene before making any safety decision.</p></div></div>
+        <div class="code-links"><p>Explore the training, results, and source code.</p><a class="source-link" href="https://github.com/AbdulrahmanAKh/YOLO_SiteSight_Project">â—‰ GitHub repository</a><a class="source-link" href="https://colab.research.google.com/github/AbdulrahmanAKh/YOLO_SiteSight_Project/blob/main/notebooks/Construction_Safety_AI.ipynb"><span class="colab-icon">âˆž</span> Run notebook in Colab</a></div>
       </section>
     </main>
-    <footer><span>© SiteSight · Construction Safety AI portfolio demo</span><span>YOLO11 · ONNX Runtime Web · Human review</span></footer>
+    <footer><div class="author"><h3>Abdulrahman Alkhatib</h3><p>Computer Science Graduate | Software &amp; AI Engineer</p><div class="author-links"><a href="https://github.com/AbdulrahmanAKh">GitHub @AbdulrahmanAKh</a><a href="https://www.linkedin.com/in/abdulrahman-alkhatib/">LinkedIn</a><a href="mailto:aboodkhatib90@gmail.com">aboodkhatib90@gmail.com</a><a href="https://abdulrahmanakh.github.io/">Portfolio</a></div><p>Notebook URL: <a href="https://AbdulrahmanAKh.github.io/YOLO_SiteSight_Project">AbdulrahmanAKh.github.io/YOLO_SiteSight_Project</a></p></div><div class="signature"><b>Developed &amp; Engineered by Abdulrahman Alkhatib</b><br><i>Computer Science Graduate | Software &amp; AI Engineer</i></div></footer>
   </div>
 </body>
 </html>
